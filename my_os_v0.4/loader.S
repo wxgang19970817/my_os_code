@@ -25,7 +25,7 @@ VIDEO_DESC:
 	GDT_SIZE equ $ - GDT_BASE	;利用　equ 伪指令定义数据常量　不会占用汇编地址也不会产生占用任何内存单元　在预处理阶段被替换　类似于宏
 	GDT_LIMIT equ GDT_SIZE - 1
 
-	times 60 dq 0 			;为GDT预留60个４字节
+	times 60 dq 0 			;为GDT预留60个8字节
 	
 	SELECTOR_CODE equ (0x0001 << 3) + TI_GDT + RPL0
 	SELECTOR_DATA equ (0x0002 << 3) + TI_GDT + RPL0
