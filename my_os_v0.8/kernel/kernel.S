@@ -3,36 +3,55 @@
 
 %define ZERO push 0        ;若在相关的异常中cpu没有压入错误码，为了统一栈中格式，就手工压入一个0
 
-extern put_str;            ;声明外部函数
+extern idt_table;          ;idt_table是在c中注册的中断处理函数数组
+
 
 section .data
-intr_str db "interrupt occur!",0xa,0
-
 global intr_entry_table
 intr_entry_table:
 
 %macro VECTOR 2
 section .text
 intr%1lentry:             ;每个中断处理程序都要压入中断,所以一个中断类型一个中断处理程序，因为参数%1的不同，会有不同的中断处理程序段
-                            
-    %2                    ;在中断发生的时候如果发生了特权级的转移，处理器会自动将:SS,ESP,eflags,CS,EIP,(error_code)压入栈中,有的中断会压入错误码，有的不会,这里的%2会被展开为nop 或者　push 0
-    push intr_str
-    call put_str
-    add esp,4             ;跳过intr_str 参数
+ 
+    %2                    ;发生中断时的入栈:CPU自动压入SS,ESP,EFLAGS,CS,EIP,(error_code)压入栈中,有的中断会压入错误码，有的不会,这里的%2会被展开为nop 或者　push 0
+    
+    push ds               ;先压入错误码后要保存进程上下文环境,压入4个16位的段寄存器,虽然是16位但是在32位环境下要占用32位
+    push es               ;但是位于其他寄存器和内存中的值如为16位，入栈后就占用2字节
+    push fs
+    push gs
+    pushad                ;再压入8个32位通用寄存器,入栈顺序:EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI
+
 
     ;如果是从片进入的中断，除了往从片上发送EOI外，还要往主片上发送EOI
     mov al,0x20
     out 0xa0,al
     out 0x20,al
 
-    add esp,4             ;跨过 error_code
-    iret                  ;从中断返回，32位下等同指令iretd
+    push %1               ;压入中断向量号方便调试
 
+    call [idt_table + %1*4] ;调用idt_table中的C版本中断处理函数
+    jmp intr_exit
 
 section .data
     dd intr%1lentry       ;在数据段保存每个中断服务程序的入口地址
 
 %endmacro
+
+
+section .text
+global intr_exit
+intr_exit:
+    ;恢复上下文环境    
+    add esp,4              ;跳过中断向量号
+    popad 
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    add esp,4              ;跳过error_code
+    iretd
+
 
 VECTOR 0x00,ZERO
 VECTOR 0x01,ZERO
