@@ -9,7 +9,7 @@
 #define __THREAD_THREAD_H
 
 #include "../lib/stdint.h"
-
+#include "../lib/kernel/list.h"
 
 /* 自定义通用函数类型，用来在线程函数中作为形参类型 */
 typedef void thread_func(void*);
@@ -90,8 +90,19 @@ struct task_struct
 {
     uint32_t* self_kstack;          /* 各内核线程都用自己的内核栈 */
     enum task_status status;        /* 类型便是前面的枚举结构enum task_status */
-    uint8_t priority;               /* 线程优先级 */
     char name[16];                  /* 记录任务（线程或进程）的名字，最长不超过16个字符 */
+    uint8_t priority;               /* 线程优先级 */
+    uint8_t ticks;                  /* 每次在处理器上执行的时间嘀嗒数。每次时钟中断都会减１ */
+
+    uint32_t elapsed_ticks;         /* 记录任务从开始到结束的总时钟数 */
+
+    /* general_tag 用于线程在一般队列中的结点 */
+    struct list_elem general_tag;
+
+    /* 线程队列 thread_all_list  */
+    struct list_elem all_list_tag;
+
+    uint32_t* pgdir;                /* 进程自己页表的虚拟地址 */
 
     /* PCB和0级栈都是在同一个页中，栈位于页的顶端，并向下发展，要保证栈不会把PCB的内容覆盖 */
     uint32_t stack_magic;           /* 栈的边界标记，用于检测栈的溢出，其实就是个魔数，每次都检查是否为初始值 */

@@ -10,12 +10,36 @@
 #include "string.h"
 #include "../kernel/global.h"
 #include "memory.h"
+#include "../kernel/interrupt.h"
+#include "../kernel/debug.h"
+
 
 #define PG_SIZE 4096
+
+struct task_struct* main_thread;        /* 主线程PCB */
+struct list thread_ready_list;          /* 就绪队列 */
+struct list thread_all_list;            /* 所有任务队列 */
+static struct list_elem* thread_tag;    /* 用于保存队列中的线程结点 */
+
+extern void switch_to(struct task_struct* cur,struct task_struct* next);
+
+
+/* 获取当前线程pcb指针 */
+struct task_struct* running_thread()
+{
+    uint32_t esp;
+    asm("mov %%esp,%0":"=g"(esp));
+
+    /* 各个线程的0特权级栈都在自己的pcb中， 取esp整数部分，即pcb的起始地址 */
+    return (struct task_struct*)(esp & 0xfffff000);
+}
+
 
 /* 由kernel_thread去执行function(func_arg) */
 static void kernel_thread(thread_func* function,void* func_arg)
 {
+    /* 执行function前要开中断，避免后面的时钟中断被屏蔽，而无法调度其他线程 */
+    intr_enable();
     function(func_arg);
 }
 
@@ -53,11 +77,27 @@ void init_thread(struct task_struct* pthread,char* name,int prio)
     /* 将线程名字写入pcb中的name数组 */
     strcpy(pthread->name,name);
 
-    /* 状态赋值 */
-    pthread->status = TASK_RUNNING;
-
+    if(pthread == main_thread)
+    {
+        /* 由于把main函数也封装成一个线程，并且它一直是运行的 */
+        /* 状态赋值 */
+        pthread->status = TASK_RUNNING;
+    }
+    else 
+    {
+        pthread->status = TASK_READY;
+    }
     /* 优先级 */
     pthread->priority = prio;
+
+    /* 时间片 */
+    pthread->ticks = prio;
+
+    /* 执行时间 */
+    pthread->elapsed_ticks = 0;
+
+    /* 线程没有自己的虚拟地址空间 */
+    pthread->pgdir = NULL;
 
     /* self_stack 是线程在内核态下使用的栈顶地址 */
     pthread->self_kstack = (uint32_t *)((uint32_t)pthread + PG_SIZE);  /* pcb顶部做栈底 */
@@ -79,7 +119,83 @@ struct task_struct* thread_start(char* name,int prio,thread_func function,void* 
 
     thread_create(thread,function,func_arg);
 
-    /* esp指向线程内核栈底即线程栈顶，根据线程栈的结构， */
-    asm volatile("movl %0,%%esp;pop %%ebp;pop %%ebx;pop %%edi;pop %%esi;ret"::"g"(thread->self_kstack):"memory");
+    /* 在加入就绪队列之前确保不在队列中 */
+    ASSERT(!elem_find(&thread_ready_list,&thread->general_tag));
+
+    /* 加入就绪队列 */
+    list_append(&thread_ready_list, &thread->general_tag);
+
+    /* 确保不在全部队列中 */
+    ASSERT(!elem_find(&thread_all_list, &thread->all_list_tag));
+
+    /* 加入全部线程队列 */
+    list_append(&thread_all_list, &thread->all_list_tag);
+
     return thread;
+
 }
+
+/* 将kernel中的main函数完善为主线程 */
+static void make_main_thread(void)
+{
+    /* main线程早已运行，但是还没有PCB，在loader.S中的mov esp,0xc009f000
+     * 就是为其预留pcb的，因此pcb地址为0xc009e000*/
+    main_thread = running_thread();
+    init_thread(main_thread,"main",7);
+
+    /* main函数是当前线程，当前线程不在thread_ready_list中，所以只将其加在thread_all_list中 */
+    /* 就绪队列只存储准备运行的线程，全部队列包括就绪的、阻塞的、正在执行的等等 */
+    ASSERT(!elem_find(&thread_all_list,&main_thread->all_list_tag));
+    list_append(&thread_all_list,&main_thread->all_list_tag);
+    
+}
+
+
+
+/* 实现任务调度 */
+void schedule()
+{
+    ASSERT(intr_get_status() == INTR_OFF);
+
+    struct task_struct* cur = running_thread();
+
+    if(cur->status == TASK_RUNNING)
+    {
+        /* 若此线程只是cpu时间片到了，将其加入到就绪队列尾 */
+        ASSERT(!elem_find(&thread_ready_list,&cur->general_tag));
+        list_append(&thread_ready_list,&cur->general_tag);
+        cur->ticks = cur->priority;
+        cur->status = TASK_READY;
+    }
+    else
+    {
+        /* 若此线程需要某事件发生后才能继续上cpu运行，不需要将其加入队列，因为当前线程不在就绪队列 */
+    }
+
+    /* 避免无线程可调度的情况，暂时用此方法保证，后续会更改 */
+    ASSERT(!list_empty(&thread_ready_list));
+
+    thread_tag = NULL;  /* thread_tag是全局变量，使用前习惯性清空 */
+    
+    /* 将就绪队列中的第一个就绪线程的PCB中的general_tag或all_list_tag弹出；准备调度上cpu */
+    thread_tag = list_pop(&thread_ready_list);
+
+    struct task_struct* next = elem2entry(struct task_struct, general_tag, thread_tag);
+
+    next->status = TASK_RUNNING;
+    switch_to(cur,next);
+}
+
+
+/* 初始化线程环境 */
+void thread_init(void)
+{
+    put_str("thread_init start\n");
+    list_init(&thread_all_list);
+    list_init(&thread_ready_list);
+    
+    /* 将当前main函数创建为线程 */
+    make_main_thread();
+    put_str("thread_init done\n");
+}
+

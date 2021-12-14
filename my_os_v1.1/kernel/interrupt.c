@@ -9,7 +9,7 @@
 #include "global.h"
 #include "../lib/kernel/io.h"
 #include "../lib/kernel/print.h"
-#include "stdint.h"
+#include "../lib/stdint.h"
 
 
 /* 可支持的中断个数,共33个 */
@@ -118,10 +118,35 @@ static void general_intr_hander(uint8_t vec_nr)
         /* IRQ7(并口1)和IRQ15(保留)会产生伪中断，无法通过IMR寄存器屏蔽 */
         return;
     }
+    
+    /* 将光标置为0，从屏幕左上角清出一片打印异常信息的区域，方便阅读 */
+    set_cursor(0);
+    int cursor_pos = 0;
+    while(cursor_pos < 320)
+    {
+        put_char(' ');
+        cursor_pos++;
+    }
 
-    put_str("int vector :0x");
-    put_int(vec_nr);
-    put_char('\n');
+    set_cursor(0);          /* 重置光标为屏幕左上角 */
+    put_str("!!!!! exception_message begin !!!!!!!\n");
+    set_cursor(88);         /* 从第2行第8个字符开始打印 */
+    put_str(intr_name[vec_nr]);
+    if(vec_nr == 14)
+    {
+        /* 若为pagefault,将缺失的地址打印出来并悬停 */
+        int page_fault_vaddr = 0;
+
+        asm("movl %%cr2,%0":"=r"(page_fault_vaddr));    /* cr2存放造成page_fault_vaddr的地址 */
+        put_str("\npage fault addr is");put_int(page_fault_vaddr);
+    }
+        put_str("\n!!!!!!  excetion message end  !!!!!!!");
+
+        /* 处理器进入中断后会自动把标志寄存器eflags中的IF位置0 */
+        /* 能进入中断处理程序就表示已经处在关中断情况下 */
+        /* 不会出现调度进程的情况。故下面的死循环不会再被中断 */
+        while(1);      
+
 }
 
 
@@ -239,5 +264,9 @@ enum intr_status intr_set_status(enum intr_status status)
 }
 
 
-
-
+/* 在中断处理程序数组第vector_no个元素中注册安装中断处理程序function */
+void register_handler(uint8_t vector_no,intr_handler function)
+{
+    /* idt_table数组中的函数是在进入中断后根据中断向量号调用的 */
+    idt_table[vector_no] = function;
+}

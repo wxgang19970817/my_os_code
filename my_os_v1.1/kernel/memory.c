@@ -305,10 +305,10 @@ static void mem_pool_init(uint32_t all_mem)
 /* 内存管理部分初始化入口 */
 void mem_init()
 {
-    put_str("mem_init start\n");
+   // put_str("mem_init start\n");
     uint32_t mem_bytes_total = (*(uint32_t *)(0xb00));
     mem_pool_init(mem_bytes_total);
-    put_str("mem_init done\n");
+   // put_str("mem_init done\n");
 }
 
 

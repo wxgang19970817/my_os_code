@@ -12,7 +12,7 @@ intr_entry_table:
 
 %macro VECTOR 2
 section .text
-intr%1lentry:             ;每个中断处理程序都要压入中断,所以一个中断类型一个中断处理程序，因为参数%1的不同，会有不同的中断处理程序段
+intr%1entry:             ;每个中断处理程序都要压入中断,所以一个中断类型一个中断处理程序，因为参数%1的不同，会有不同的中断处理程序段
  
     %2                    ;发生中断时的入栈:CPU自动压入SS,ESP,EFLAGS,CS,EIP,(error_code)压入栈中,有的中断会压入错误码，有的不会,这里的%2会被展开为nop 或者　push 0
     
@@ -34,7 +34,7 @@ intr%1lentry:             ;每个中断处理程序都要压入中断,所以一�
     jmp intr_exit
 
 section .data
-    dd intr%1lentry       ;在数据段保存每个中断服务程序的入口地址
+    dd intr%1entry       ;在数据段保存每个中断服务程序的入口地址
 
 %endmacro
 

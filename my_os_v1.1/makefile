@@ -9,8 +9,8 @@ CFLAGS = -Wall $(LIB) -c -m32 -fno-builtin -fno-stack-protector -W -Wstrict-prot
 LDFLAGS = -Ttext $(ENTRY_POINT) -e main -m elf_i386 -Map $(BULID_DIR)/kernel.map
 OBJS = $(BULID_DIR)/main.o $(BULID_DIR)/init.o $(BULID_DIR)/interrupt.o \
 	   $(BULID_DIR)/timer.o $(BULID_DIR)/kernel.o $(BULID_DIR)/print.o \
-	   $(BULID_DIR)/debug.o $(BULID_DIR)/memory.o $(BULID_DIR)/bitmap.o $(BULID_DIR)/string.o $(BULID_DIR)/thread.o
-
+	   $(BULID_DIR)/debug.o $(BULID_DIR)/memory.o $(BULID_DIR)/bitmap.o $(BULID_DIR)/string.o $(BULID_DIR)/thread.o \
+	   $(BULID_DIR)/list.o $(BULID_DIR)/switch.o
 
 ###############    c代码编译　###############
 $(BULID_DIR)/main.o : kernel/main.c lib/kernel/print.h lib/stdint.h kernel/init.h
@@ -42,8 +42,10 @@ $(BULID_DIR)/memory.o : kernel/memory.c kernel/memory.h lib/stdint.h lib/kernel/
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(BULID_DIR)/thread.o : thread/thread.c thread/thread.h lib/stdint.h lib/string.h kernel/global.h kernel/memory.h
-
 	$(CC) $(CFLAGS) -o $@ $< 
+
+$(BULID_DIR)/list.o	: lib/kernel/list.c lib/kernel/list.h kernel/global.h lib/stdint.h kernel/interrupt.h
+	$(CC) $(CFLAGS) -o $@ $<
 
 ###############		汇编代码编译　#################
 $(BULID_DIR)/kernel.o : kernel/kernel.S
@@ -52,7 +54,8 @@ $(BULID_DIR)/kernel.o : kernel/kernel.S
 $(BULID_DIR)/print.o : lib/kernel/print.S
 	$(AS) $(ASFLAGS) $< -o $@
 
-
+$(BULID_DIR)/switch.o : thread/switch.S
+	$(AS) $(ASFLAGS) $< -o $@
 
 ###############  	 链接所有目标文件　###############
 $(BULID_DIR)/kernel.bin : $(OBJS)
