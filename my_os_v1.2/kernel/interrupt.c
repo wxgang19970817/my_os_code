@@ -12,8 +12,11 @@
 #include "../lib/stdint.h"
 
 
-/* 可支持的中断个数,共33个 */
-#define IDT_DESC_CNT 0x21           
+/* 可支持的中断个数 */
+#define IDT_DESC_CNT 0x30           
+
+
+
 
 #define PIC_M_CTRL 0x20         /* 主片控制端口 */
 #define PIC_M_DATA 0x21         /* 主片数据端口 */
@@ -79,7 +82,11 @@ static void pic_init(void)
     outb(PIC_S_DATA,0x01);   /* ICW4:8086模式,正常EOI */
 
     /* 打开主片上IR0,也就是目前只接受时钟产生的中断 */
-    outb(PIC_M_DATA,0xfe);
+   // outb(PIC_M_DATA,0xfe);
+   // outb(PIC_S_DATA,0xff);
+
+    /* 测试键盘，只打开键盘中断，其他全部关闭 */
+    outb(PIC_M_DATA,0xfd);
     outb(PIC_S_DATA,0xff);
 
     put_str("pic_init done\n");

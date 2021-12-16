@@ -10,7 +10,7 @@ LDFLAGS = -Ttext $(ENTRY_POINT) -e main -m elf_i386 -Map $(BULID_DIR)/kernel.map
 OBJS = $(BULID_DIR)/main.o $(BULID_DIR)/init.o $(BULID_DIR)/interrupt.o \
 	   $(BULID_DIR)/timer.o $(BULID_DIR)/kernel.o $(BULID_DIR)/print.o \
 	   $(BULID_DIR)/debug.o $(BULID_DIR)/memory.o $(BULID_DIR)/bitmap.o $(BULID_DIR)/string.o $(BULID_DIR)/thread.o \
-	   $(BULID_DIR)/list.o $(BULID_DIR)/switch.o $(BULID_DIR)/console.o $(BULID_DIR)/sync.o
+	   $(BULID_DIR)/list.o $(BULID_DIR)/switch.o $(BULID_DIR)/console.o $(BULID_DIR)/sync.o $(BULID_DIR)/keyboard.o
 
 ###############    c代码编译　###############
 $(BULID_DIR)/main.o : kernel/main.c lib/kernel/print.h lib/stdint.h kernel/init.h
@@ -53,6 +53,10 @@ $(BULID_DIR)/console.o : device/console.c device/console.h lib/stdint.h lib/kern
 
 $(BULID_DIR)/sync.o : thread/sync.c thread/sync.h lib/kernel/list.h kernel/global.h lib/stdint.h thread/thread.h \
 						lib/string.h lib/stdint.h kernel/debug.h
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(BULID_DIR)/keyboard.o : device/keyboard.c device/keyboard.h lib/kernel/print.h lib/stdint.h kernel/interrupt.h \
+						lib/kernel/io.h thread/thread.h lib/kernel/list.h kernel/global.h thread/sync.h thread/thread.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 ###############		汇编代码编译　#################
