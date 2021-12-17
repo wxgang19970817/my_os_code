@@ -1,8 +1,13 @@
 #include "../lib/kernel/print.h"
 #include "init.h"
 #include "memory.h"
+#include "interrupt.h"
 #include "../thread/thread.h"
 #include "../device/console.h"
+
+/* 临时为测试添加 */
+#include "../device/ioqueue.h"
+#include "../device/keyboard.h"
 
 void k_thread_a(void*);
 void k_thread_b(void*);
@@ -13,8 +18,8 @@ int main(void)
     put_str("I am kernel\n");
     init_all();
 
-   // thread_start("k_thread_a",31,k_thread_a,"argS ");
-   // thread_start("k_thread_b",8,k_thread_b,"argB ");
+   thread_start("consumer",31,k_thread_a," A_ ");
+   thread_start("consumer",31,k_thread_b," B_ ");
 
     intr_enable();          /* 开中断，使时钟中断起作用 */
     while(1);
@@ -30,7 +35,14 @@ void k_thread_a(void* arg)
     char* para = arg;
     while (1) 
     {
-        console_put_str(para);
+        enum intr_status old_status = intr_disable();
+        if (!ioq_empty(&kbd_buf))
+        {
+            console_put_str(arg);
+            char byte = ioq_getchar(&kbd_buf);
+            console_put_char(byte);
+        }
+        intr_set_status(old_status);
     }
 }
 
@@ -39,6 +51,13 @@ void k_thread_b(void* arg)
     char* para = arg;
     while(1)
     {
-        console_put_str(para);
+          enum intr_status old_status = intr_disable();
+        if (!ioq_empty(&kbd_buf))
+        {
+            console_put_str(arg);
+            char byte = ioq_getchar(&kbd_buf);
+            console_put_char(byte);
+        }
+        intr_set_status(old_status);
     }
 }
