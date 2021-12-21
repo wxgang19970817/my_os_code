@@ -10,6 +10,8 @@
 
 #include "../lib/stdint.h"
 #include "../lib/kernel/list.h"
+#include "bitmap.h"
+#include "memory.h"
 
 /* 自定义通用函数类型，用来在线程函数中作为形参类型 */
 typedef void thread_func(void*);
@@ -102,11 +104,15 @@ struct task_struct
     /* 线程队列 thread_all_list  */
     struct list_elem all_list_tag;
 
-    uint32_t* pgdir;                /* 进程自己页表的虚拟地址 */
+    uint32_t* pgdir;                /* 用于存放进程自己页目录表的虚拟地址，这个地址会加载到cr3，加载时由此虚拟地址转变为物理地址 */
 
+    struct virtual_addr userprog_vaddr;     /* 用户进程的虚拟地址池 */
     /* PCB和0级栈都是在同一个页中，栈位于页的顶端，并向下发展，要保证栈不会把PCB的内容覆盖 */
     uint32_t stack_magic;           /* 栈的边界标记，用于检测栈的溢出，其实就是个魔数，每次都检查是否为初始值 */
 };
+
+extern struct list thread_ready_list;
+extern struct list thread_all_list;
 
 void thread_create(struct task_struct* pthread, thread_func function, void* func_arg);
 void init_thread(struct task_struct* pthread, char* name, int prio);

@@ -26,19 +26,6 @@ enum pool_flags
 };
 
 
-
-/* 内存池结构体，实例化之后用于管理内核内存池和用户内存池 */
-/* 与在memory.h中定义的虚拟地址池　virtual_addr 相比多了一个成员用来描述有限的物理内存量 */
-struct pool
-{
-    struct bitmap pool_bitmap;      /* 本内存池用到的位图结构 */
-    uint32_t phy_addr_start;        /* 本内存池管理的物理内存的起始地址 */
-    uint32_t pool_size;             /* 本内存池的字节容量 */
-};
-
-
-
-
 #define PG_P_1 1            /* 页表项或页目录项存在属性位  */
 #define PG_P_0 0            /* 页表项或页目录项存在属性位 */
 #define PG_RW_R 0           /* R/W 属性位值　读/执行 */
@@ -48,6 +35,13 @@ struct pool
 
 extern struct pool kenel_pool,user_pool;
 void mem_init(void);
-
+void* get_kernel_pages(uint32_t pg_cnt);
+void* malloc_page(enum pool_flags pf, uint32_t pg_cnt);
+void malloc_init(void);
+uint32_t* pte_ptr(uint32_t vaddr);
+uint32_t* pde_ptr(uint32_t vaddr);
+uint32_t addr_v2p(uint32_t vaddr);
+void* get_a_page(enum pool_flags pf, uint32_t vaddr);
+void* get_user_pages(uint32_t pg_cnt);
 
 #endif

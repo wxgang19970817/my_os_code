@@ -9,10 +9,10 @@
 #include "../lib/stdint.h"
 #include "string.h"
 #include "../kernel/global.h"
-#include "memory.h"
+#include "../kernel/memory.h"
 #include "../kernel/interrupt.h"
 #include "../kernel/debug.h"
-
+#include "../userprog/process.h"
 
 #define PG_SIZE 4096
 
@@ -183,6 +183,10 @@ void schedule()
     struct task_struct* next = elem2entry(struct task_struct, general_tag, thread_tag);
 
     next->status = TASK_RUNNING;
+
+    /* 激活任务页表等 */
+    process_activate(next);
+
     switch_to(cur,next);
 }
 

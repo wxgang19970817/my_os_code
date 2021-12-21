@@ -39,7 +39,7 @@
 #define SELECTOR_K_STACK SELECTOR_K_DATA
 #define SELECTOR_K_GS   ((3<<3) + (TI_GDT << 2) + RPL0)
 #define SELECTOR_U_CODE ((5 << 3) + (TI_GDT << 2) + RPL3)
-#define SELECTOR_U_DATA ((5 << 3) + (TI_GDT << 2) + RPL3)
+#define SELECTOR_U_DATA ((6 << 3) + (TI_GDT << 2) + RPL3)
 #define	SELECTOR_U_STACK SELECTOR_U_DATA
 
 #define GDT_ATTR_HIGH ((DESC_G_4K << 7) + (DESC_D_32 << 6) + (DESC_L << 5) + (DESC_AVL << 4))
@@ -82,7 +82,49 @@ struct gdt_desc
 #define IDT_DESC_ATTR_DPL3 \
     ((IDT_DESC_P << 7) + (IDT_DESC_DPL3 << 5) + IDT_DESC_32_TYPE
 
+
+
+/*---------------    eflags属性    ----------------*/ 
+
+/********************************************************
+--------------------------------------------------------------
+		  Intel 8086 Eflags Register
+--------------------------------------------------------------
+*
+*     15|14|13|12|11|10|F|E|D C|B|A|9|8|7|6|5|4|3|2|1|0|
+*      |  |  |  |  |  | | |  |  | | | | | | | | | | | '---  CF……Carry Flag
+*      |  |  |  |  |  | | |  |  | | | | | | | | | | '---  1 MBS
+*      |  |  |  |  |  | | |  |  | | | | | | | | | '---  PF……Parity Flag
+*      |  |  |  |  |  | | |  |  | | | | | | | | '---  0
+*      |  |  |  |  |  | | |  |  | | | | | | | '---  AF……Auxiliary Flag
+*      |  |  |  |  |  | | |  |  | | | | | | '---  0
+*      |  |  |  |  |  | | |  |  | | | | | '---  ZF……Zero Flag
+*      |  |  |  |  |  | | |  |  | | | | '---  SF……Sign Flag
+*      |  |  |  |  |  | | |  |  | | | '---  TF……Trap Flag
+*      |  |  |  |  |  | | |  |  | | '---  IF……Interrupt Flag
+*      |  |  |  |  |  | | |  |  | '---  DF……Direction Flag
+*      |  |  |  |  |  | | |  |  '---  OF……Overflow flag
+*      |  |  |  |  |  | | |  '----  IOPL……I/O Privilege Level
+*      |  |  |  |  |  | | '-----  NT……Nested Task Flag
+*      |  |  |  |  |  | '-----  0
+*      |  |  |  |  |  '-----  RF……Resume Flag
+*      |  |  |  |  '------  VM……Virtual Mode Flag
+*      |  |  |  '-----  AC……Alignment Check
+*      |  |  '-----  VIF……Virtual Interrupt Flag  
+*      |  '-----  VIP……Virtual Interrupt Pending
+*      '-----  ID……ID Flag
+*
+*
+**********************************************************/
+#define EFLAGS_MBS 		(1 << 1)					/* 此项必须要设置 */
+#define EFLAGS_IF_1 	 (1 << 9)					 /* if 为1,开中断 */
+#define EFLAGS_IF_0 	 0								  /* if 为0,关中断 */
+#define EFLAGS_IOPL_3 (3 << 12)				   /* IOPL3,用于测试用户程序在非系统调用下进行IO */
+#define EFLAGS_IOPL_0 (0 << 12)					/* IOPL0 */
+
+
 #define NULL ((void*) 0)
+#define DIV_ROUND_UP(X,STEP) ((X + STEP -1)/(STEP))
 #define bool int
 #define true 1
 #define false 0

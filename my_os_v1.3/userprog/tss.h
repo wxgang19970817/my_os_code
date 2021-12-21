@@ -9,7 +9,7 @@
 
 #include "../thread/thread.h"
 
-void updata_tss_esp(struct task_struct* pthread);
+void update_tss_esp(struct task_struct* pthread);
 void tss_init(void);
 
 

@@ -3,7 +3,7 @@ ENTRY_POINT = 0xc0001500
 AS = nasm
 CC = gcc
 LD = ld
-LIB = -I lib -I lib/kernel -I kernel -I device -I thread
+LIB = -I lib -I lib/kernel -I kernel -I device -I thread -I userprog
 ASFLAGS = -f elf
 CFLAGS = -Wall $(LIB) -c -m32 -fno-builtin -fno-stack-protector -W -Wstrict-prototypes -Wmissing-prototypes
 LDFLAGS = -Ttext $(ENTRY_POINT) -e main -m elf_i386 -Map $(BUILD_DIR)/kernel.map
@@ -11,7 +11,7 @@ OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o \
 	   $(BUILD_DIR)/timer.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o \
 	   $(BUILD_DIR)/debug.o $(BUILD_DIR)/memory.o $(BUILD_DIR)/bitmap.o $(BUILD_DIR)/string.o $(BUILD_DIR)/thread.o \
 	   $(BUILD_DIR)/list.o $(BUILD_DIR)/switch.o $(BUILD_DIR)/console.o $(BUILD_DIR)/sync.o $(BUILD_DIR)/keyboard.o \
-	   $(BUILD_DIR)/ioqueue.o $(BUILD_DIR)/tss.o
+	   $(BUILD_DIR)/ioqueue.o $(BUILD_DIR)/tss.o $(BUILD_DIR)/process.o
 ###############    c代码编译　###############
 $(BUILD_DIR)/main.o : kernel/main.c lib/kernel/print.h lib/stdint.h kernel/init.h kernel/interrupt.h kernel/memory.h  thread/thread.h device/console.h \
 						device/ioqueue.h device/ioqueue.h
@@ -68,6 +68,12 @@ $(BUILD_DIR)/tss.o : userprog/tss.c userprog/tss.h thread/thread.h lib/stdint.h 
     	lib/kernel/list.h kernel/global.h lib/string.h lib/stdint.h \
      	lib/kernel/print.h
 	$(CC) $(CFLAGS) -o $@ $<
+
+$(BUILD_DIR)/process.o: userprog/process.c userprog/process.h thread/thread.h \
+    	lib/stdint.h lib/kernel/list.h kernel/global.h kernel/debug.h \
+     	kernel/memory.h lib/kernel/bitmap.h userprog/tss.h kernel/interrupt.h \
+      	lib/string.h lib/stdint.h
+	$(CC) $(CFLAGS) $< -o $@
 ###############		汇编代码编译　#################
 $(BUILD_DIR)/kernel.o : kernel/kernel.S
 	$(AS) $(ASFLAGS) $< -o $@

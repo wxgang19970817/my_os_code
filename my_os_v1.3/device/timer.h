@@ -9,7 +9,7 @@
 
 #include "../lib/stdint.h"
 
-void timer_init();
+void timer_init(void);
 
 
 #endif

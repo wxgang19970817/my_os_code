@@ -47,7 +47,7 @@ struct tss
 static struct tss tss;
 
 /* 更新tss中esp0字段的值为pthread的0级栈,PCB页面的顶端 */
-void updata_tss_esp(struct task_struct* pthread)
+void update_tss_esp(struct task_struct* pthread)
 {
     tss.esp0 = (uint32_t*)((uint32_t)pthread + PG_SIZE);
 }
