@@ -1,3 +1,5 @@
+
+
 #include "../lib/kernel/print.h"
 #include "init.h"
 #include "memory.h"
@@ -7,12 +9,13 @@
 #include "../userprog/process.h"
 #include "../userprog/syscall-init.h"
 #include "syscall.h"
+#include "stdio.h"
 
 void k_thread_a(void*);
 void k_thread_b(void*);
 void u_prog_a(void);
 void u_prog_b(void);
-int prog_a_pid = 0,prog_b_pid = 0;
+
 
 int main(void)
 {
@@ -37,11 +40,8 @@ void k_thread_a(void* arg)
     /* 用void*来通用表示参数，被调用的函数知道自己需要什么类型的参数，自己转换再用 */
     char* para = arg;
     
-    console_put_str(" thread_a_pid:0x");
+    console_put_str(" i am thread_a,my pid:0x");
     console_put_int(sys_getpid());
-    console_put_char('\n');
-    console_put_str(" prog_a_pid:0x");
-    console_put_int(prog_a_pid);
     console_put_char('\n');
     while (1);
 }
@@ -50,11 +50,8 @@ void k_thread_b(void* arg)
 {
     char* para = arg;
     
-    console_put_str(" thread_b_pid:0x");
+    console_put_str(" i am thread_b,my pid:0x");
     console_put_int(sys_getpid());
-    console_put_char('\n');
-    console_put_str(" prog_b_pid:0x");
-    console_put_int(prog_b_pid);
     console_put_char('\n');
     while (1);
 }
@@ -63,12 +60,14 @@ void k_thread_b(void* arg)
 /* 测试用户进程 */
 void u_prog_a(void)
 {
-    prog_a_pid = getpid();
+    char* name = "prog_a";
+    printf("I am %s,my_pid:%d%c",name,getpid(),'\n');
     while(1);
 }
 
 void u_prog_b(void)
 {
-    prog_b_pid = getpid();
+    char* name = "prog_b";
+    printf(" I am %s, my pid:%d%c", name, getpid(), '\n');
     while(1);
 }

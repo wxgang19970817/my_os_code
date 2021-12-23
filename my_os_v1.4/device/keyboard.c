@@ -36,7 +36,7 @@
 #define shift_r_make    0x36
 #define alt_l_make      0x38
 #define alt_r_make      0xe038
-#define alt_break       0xe0b8
+#define alt_r_break       0xe0b8
 #define ctrl_l_make     0x1d
 #define ctrl_r_make     0xe01d
 #define ctrl_r_break    0xe09d

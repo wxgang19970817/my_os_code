@@ -17,7 +17,7 @@
 #define COUNTER0_VALUE      INPUT_FREQUENCY / IRQ0_FREQUENCY
 #define COUNTER0_PORT       0x40
 #define COUNTER0_NO         0
-#define COUNTER0_MODE       2
+#define COUNTER_MODE       2
 #define READ_WRITE_LATCH    3
 #define PIT_CONTROL_PORT    0x43
 
@@ -67,7 +67,7 @@ void timer_init()
     put_str("timer_init start\n");
     
     /* 设置8253的定时周期，也就是发中断周期 */
-    frequency_set(COUNTER0_PORT,COUNTER0_NO,READ_WRITE_LATCH,COUNTER0_MODE,COUNTER0_VALUE);
+    frequency_set(COUNTER0_PORT,COUNTER0_NO,READ_WRITE_LATCH,COUNTER_MODE,COUNTER0_VALUE);
 
     /* 注册时钟中断 */
     register_handler(0x20,intr_timer_handler);

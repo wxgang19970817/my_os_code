@@ -177,7 +177,7 @@ static void exception_init(void)
     }
 
     /* 异常名字赋值 */
-    intr_name[0] = "#DE Divid Error";
+    intr_name[0] = "#DE Divide Error";
     intr_name[1] = "#DB Debug Exception";
     intr_name[2] = "NMI Interrupt";
     intr_name[3] = "#BP Breakpoint Exception";
@@ -204,24 +204,6 @@ static void exception_init(void)
 
 
 
-/* 完成有关中断的所有初始化工作 */
-void idt_init()
-{
-    put_str("idt_init start\n");
-
-    /* 构造中断描述符表 */
-    idt_desc_init();               
-    
-    /* 异常名初始化并注册通常的中断处理函数 */
-    exception_init();
-
-    /* 初始化8259A */
-    pic_init();
-    /* 加载idt 32位基地址　+ 16位段界限*/
-    uint64_t idt_operand = ((sizeof(idt) - 1) | ((uint64_t)(uint32_t)idt << 16));
-    asm volatile("lidt %0"::"m"(idt_operand));
-    put_str("idt_init done\n");
-}
 
 
 /* 获取当前中断状态 */
@@ -280,4 +262,23 @@ void register_handler(uint8_t vector_no,intr_handler function)
 {
     /* idt_table数组中的函数是在进入中断后根据中断向量号调用的 */
     idt_table[vector_no] = function;
+}
+
+/* 完成有关中断的所有初始化工作 */
+void idt_init()
+{
+    put_str("idt_init start\n");
+
+    /* 构造中断描述符表 */
+    idt_desc_init();               
+    
+    /* 异常名初始化并注册通常的中断处理函数 */
+    exception_init();
+
+    /* 初始化8259A */
+    pic_init();
+    /* 加载idt 32位基地址　+ 16位段界限*/
+    uint64_t idt_operand = ((sizeof(idt) - 1) | ((uint64_t)(uint32_t)idt << 16));
+    asm volatile("lidt %0"::"m"(idt_operand));
+    put_str("idt_init done\n");
 }
