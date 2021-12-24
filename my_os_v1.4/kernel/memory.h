@@ -1,3 +1,4 @@
+
 /*************************************************************************
 	> File Name: memory.h
 	> Author: wxgang
@@ -10,6 +11,7 @@
 
 #include "../lib/stdint.h"
 #include "../lib/kernel/bitmap.h"
+#include "list.h"
 
 /* 虚拟地址池，用于虚拟地址管理 */
 struct virtual_addr
@@ -25,6 +27,21 @@ enum pool_flags
     PF_USER = 2                 /* 用户内存池 */
 };
 
+/* 内存块 */
+struct mem_block
+{
+    struct list_elem free_elem;
+};
+ 
+/* 内存块描述符 */
+struct mem_block_desc
+{
+    uint32_t block_size;        /* 内存块大小 */
+    uint32_t blocks_per_arena;      /* 本arena中可容纳此mem_block的数量 */
+    struct list free_list;              /* 链表的长度是无限大,可由多个arena提供，并不是等于blocks_per_arena的数量 */
+};
+
+#define DESC_CNT 7          /* 内存块描述符个数 */
 
 #define PG_P_1 1            /* 页表项或页目录项存在属性位  */
 #define PG_P_0 0            /* 页表项或页目录项存在属性位 */
@@ -33,7 +50,7 @@ enum pool_flags
 #define PG_US_S 0           /* U/S 属性位值，系统级 */
 #define PG_US_U 4           /* U/S 属性位值，用户级 */
 
-extern struct pool kenel_pool,user_pool;
+extern struct pool kernel_pool,user_pool;
 void mem_init(void);
 void* get_kernel_pages(uint32_t pg_cnt);
 void* malloc_page(enum pool_flags pf, uint32_t pg_cnt);
@@ -43,5 +60,5 @@ uint32_t* pde_ptr(uint32_t vaddr);
 uint32_t addr_v2p(uint32_t vaddr);
 void* get_a_page(enum pool_flags pf, uint32_t vaddr);
 void* get_user_pages(uint32_t pg_cnt);
-
+void block_desc_init(struct mem_block_desc* desc_array);
 #endif

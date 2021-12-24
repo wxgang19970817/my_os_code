@@ -12,7 +12,7 @@
 
 typedef void* intr_handler;
 void idt_init(void);
-
+  
 /* 定义中断的两种状态:INTR_OFF=0,表示关中断;INTR_ON=1,表示开中断 */
 enum intr_status{
     INTR_OFF,         /* 关中断 */
