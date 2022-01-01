@@ -13,6 +13,9 @@
 #include "bitmap.h"
 #include "../kernel/memory.h"
 
+
+#define MAX_FILES_OPEN_PER_PROC     8               /* 每个任务可以打开文件数是8 */
+
 /* 自定义通用函数类型，用来在线程函数中作为形参类型 */
 typedef void thread_func(void*);
 typedef int16_t pid_t;
@@ -99,6 +102,7 @@ struct task_struct
 
     uint32_t elapsed_ticks;         /* 记录任务从开始到结束的总时钟数 */
 
+    int32_t fd_table[MAX_FILES_OPEN_PER_PROC];          /* 文件描述符数组，该数组的下标就是文件描述符，数组里面存储的是文件结构表的下标 */
     /* general_tag 用于线程在一般队列中的结点 */
     struct list_elem general_tag;
 

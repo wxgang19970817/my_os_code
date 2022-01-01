@@ -9,6 +9,7 @@
 #include "../userprog/syscall-init.h"
 #include "syscall.h"
 #include "stdio.h"
+#include "fs.h"
 
 void k_thread_a(void*);
 void k_thread_b(void*);
@@ -20,7 +21,6 @@ int main(void)
 {
     put_str("I am kernel\n");
     init_all();
-	while(1);
     process_execute(u_prog_a,"user_prog_a");
     process_execute(u_prog_b,"user_prog_b");
 
@@ -28,6 +28,8 @@ int main(void)
  
     thread_start("k_thread_a", 31, k_thread_a, "I am thread_a");
     thread_start("k_thread_b", 31, k_thread_b, "I am thread_b ");
+
+    sys_open("/file1",O_CREAT);
     while(1);
     return 0;
 }
@@ -44,7 +46,7 @@ void k_thread_a(void* arg)
     console_put_int((int)addr2);
     console_put_char(',');
     console_put_int((int)addr3);
-    console_put_char(',');
+    console_put_char('\n');
 
     int cpu_delay = 100000;
     while(cpu_delay-- > 0);

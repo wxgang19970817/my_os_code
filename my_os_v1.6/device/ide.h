@@ -20,7 +20,7 @@ struct partition
 	struct disk* 	  		  my_disk;			    /* 分区所属的硬盘 */
 	struct list_elem 	  part_tag;			    /* 本分区将来会汇总到队列中，用此标记 */
 	char name[8];						  				  /* 分区名称 */
-	struct	super_block* sb;				 /* 本分区超级块 */
+	struct	super_block* sb;				     /* 本分区超级块 */
 	struct	bitmap			block_bitmap;/* 块位图,管理文件系统读取磁盘的多个扇区组成的块 */
 	struct	bitmap			inode_bitmap;/* i结点位图 */
 	struct	list				   open_inodes;	 /* 本分区打开的i结点队列 */
@@ -29,7 +29,7 @@ struct partition
 /* 硬件的结构 */
 struct disk
 {
-	char 					name[8];				/* 本硬盘的名称 */
+	char 					name[8];							  /* 本硬盘的名称 */
 	struct	ide_channel* my_channel;		/* 此硬盘归属于哪个ide通道 */
 	uint8_t				  dev_no;								/* 本硬盘是主0,还是从1 */
 	struct	partition	prim_parts[4];			   /* 主分区顶多有4个 */

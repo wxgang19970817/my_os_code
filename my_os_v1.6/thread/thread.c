@@ -131,6 +131,19 @@ void init_thread(struct task_struct* pthread,char* name,int prio)
     /* self_stack 是线程在内核态下使用的栈顶地址 */
     pthread->self_kstack = (uint32_t *)((uint32_t)pthread + PG_SIZE);  /* pcb顶部做栈底 */
 
+    /* 预留标准输入输出 */
+    pthread->fd_table[0] = 0;       /* 标准的文件描述符，0是标准输入 */
+    pthread->fd_table[1] = 1;       /* 1是标准输出 */
+    pthread->fd_table[2] = 2;       /* 2是标准错误 */
+
+    /* 其余全置为-1 */
+    uint8_t fd_idx = 3;
+    while(fd_idx < MAX_FILES_OPEN_PER_PROC)
+    {
+        pthread->fd_table[fd_idx] = -1;         /* -1表示该文件描述符可分配 */
+        fd_idx++;
+    }
+
     /* 边界检查的魔数会被安排在pbc结构体和栈顶的交界处 */
     pthread->stack_magic = 0x19870916; 
 }
