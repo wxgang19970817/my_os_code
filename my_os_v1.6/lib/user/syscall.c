@@ -22,7 +22,7 @@
 
 /* 三个参数的系统调用 */
 #define _syscall3(NUMBER,ARG1,ARG2,ARG3) \
- ({int retval;asm volatile("int $0x80":"=a"(retval):"a"(NUMBER),"b"(ARG1),"c"(ARG2)."d"(ARG3):"memory");retval;})
+ ({int retval;asm volatile("int $0x80":"=a"(retval):"a"(NUMBER),"b"(ARG1),"c"(ARG2),"d"(ARG3):"memory");retval;})
 
 
  /* 返回当前任务pid */
@@ -32,10 +32,10 @@
  }
 
 
- /* 打印字符串str */
- uint32_t write(char* str)
+ /* 把buf中 count 个字符写入文件描述符 fd */
+ uint32_t write(int32_t fd,const void* buf,uint32_t count)
  {
-	 return _syscall1(SYS_WRITE,str);
+	 return _syscall3(SYS_WRITE,fd,buf,count);
  }
 
   /* 申请size字节大小的内存，并返回结果 */
