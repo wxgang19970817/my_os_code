@@ -9,8 +9,9 @@
 #include "syscall.h"
 #include "stdio.h"
 #include "memory.h"
+#include "dir.h"
 #include "fs.h"
-#include "string.h"
+
 void k_thread_a(void*);
 void k_thread_b(void*);
 void u_prog_a(void);
@@ -21,25 +22,38 @@ int main(void)
 {
     put_str("I am kernel\n");
     init_all();
-    process_execute(u_prog_a,"user_prog_a");
-    process_execute(u_prog_b,"user_prog_b");
+ 
 
-    thread_start("k_thread_a", 31, k_thread_a, "I am thread_a");
-    thread_start("k_thread_b", 31, k_thread_b, "I am thread_b ");
-
-    printf("/dir1/subdir1 create %s!\n",sys_mkdir("/dir1/subdir") == 0?"done":"fail");
-    printf("/dir1 create %s!\n",sys_mkdir("/dir1") == 0?"done" : "fail");
-    printf("now,/dir1.subdir1 create %s!\n",sys_mkdir("/dir1/subdir1") == 0 ? "done" : "fail");
-    int fd = sys_open("/dir1/subdir1/file2",O_CREAT|O_RDWR);
-    if(fd != -1)
+    struct dir* p_dir  = sys_opendir("/dir1/subdir1");
+    if(p_dir)
     {
-        printf("/dir1/subdir1/file2 create done!\n");
-        sys_write(fd,"Catch me if you can!\n",21);
-        sys_lseek(fd,0,SEEK_SET);
-        char buf[32] = {0};
-        sys_read(fd,buf,21);
-        printf("/dir1/subdir1/file2 says:\n%s",buf);
-        sys_close(fd);
+        printf("/dir1/subdir1 open done!\n content:\n");
+        char* type = NULL;
+        struct dir_entry* dir_e = NULL;
+        while((dir_e = sys_readdir(p_dir)))
+        {
+            if(dir_e->f_type == FT_REGULAR)
+            {
+                type = "regular";
+            }
+            else
+            {
+                type = "directory";
+            }
+            printf("   %s    %s\n",type,dir_e->filename);
+        }
+        if(sys_closedir(p_dir) == 0)
+        {
+            printf("/dir1/subdir1 close done!\n");
+        }
+        else
+        {
+            printf("/dir1/subdir1 close fail!\n");
+        }
+    }
+    else
+    {
+        printf("/dir1/subdir1 open failed!\n");
     }
     while(1);
     return 0;
