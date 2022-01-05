@@ -24,14 +24,15 @@ int main(void)
     init_all();
  
    /**** 测试代码*********/
-   char cwd_buf[32] = {0};
-   sys_getcwd(cwd_buf,32);
-   printf("cwd:%s\n",cwd_buf);
-   sys_chdir("/dir1");
-   printf("change cwd now\n");
-   sys_getcwd(cwd_buf,32);
-   printf("cwd:%s\n",cwd_buf);
-
+   struct stat obj_stat;
+   sys_stat("/", &obj_stat);
+   printf("/`s info\n   i_no:%d\n   size:%d\n   filetype:%s\n", \
+     obj_stat.st_ino, obj_stat.st_size, \
+	 obj_stat.st_filetype == 2 ? "directory" : "regular");
+   sys_stat("/dir1", &obj_stat);
+   printf("/dir1`s info\n   i_no:%d\n   size:%d\n   filetype:%s\n", \
+	 obj_stat.st_ino, obj_stat.st_size, \
+	 obj_stat.st_filetype == 2 ? "directory" : "regular");
     while(1);
     return 0;
 }

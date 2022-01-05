@@ -52,6 +52,15 @@ struct path_search_record
 	enum file_types file_type;			/* 找到的是普通文件还是目录，找不到将为未知类型(FT_UNKNOWN) */
 };
 
+
+/* 文件属性结构体 */
+struct stat
+{
+	uint32_t st_ino;			/* inode编号 */
+	uint32_t st_size;			/* 尺寸 */
+	enum file_types st_filetype;	/* 文件类型 */
+};
+
 extern struct partition* cur_part;
 void filesys_init(void);
 int32_t path_depth_cnt(char* pathname);
@@ -66,4 +75,8 @@ struct dir* sys_opendir(const char* pathname);
 int32_t sys_closedir(struct dir* dir);
 struct dir_entry* sys_readdir(struct dir* dir);
 void sys_rewinddir(struct dir* dir);
+int32_t sys_rmdir(const char* pathname);
+char* sys_getcwd(char* buf, uint32_t size);
+int32_t sys_chdir(const char* path);
+int32_t sys_stat(const char* path, struct stat* buf);
 #endif 
