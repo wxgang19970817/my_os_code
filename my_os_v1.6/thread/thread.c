@@ -144,6 +144,8 @@ void init_thread(struct task_struct* pthread,char* name,int prio)
         fd_idx++;
     }
 
+    pthread->cwd_inode_nr = 0;          /* 以根目录作为默认工作路径 */
+
     /* 边界检查的魔数会被安排在pbc结构体和栈顶的交界处 */
     pthread->stack_magic = 0x19870916; 
 }

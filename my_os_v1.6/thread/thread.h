@@ -114,6 +114,9 @@ struct task_struct
     struct virtual_addr userprog_vaddr;     /* 用户进程的虚拟地址池 */
 
     struct mem_block_desc u_block_desc[DESC_CNT];   /* 用户进程内存块描述符 */
+
+    uint32_t cwd_inode_nr;          /* 进程所在的工作目录的inode编号 */
+
     /* PCB和0级栈都是在同一个页中，栈位于页的顶端，并向下发展，要保证栈不会把PCB的内容覆盖 */
     uint32_t stack_magic;           /* 栈的边界标记，用于检测栈的溢出，其实就是个魔数，每次都检查是否为初始值 */
 };
