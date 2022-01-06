@@ -102,7 +102,7 @@ struct task_struct
 
     uint32_t elapsed_ticks;         /* 记录任务从开始到结束的总时钟数 */
 
-    int32_t fd_table[MAX_FILES_OPEN_PER_PROC];          /* 文件描述符数组，该数组的下标就是文件描述符，数组里面存储的是文件结构表的下标 */
+   
     /* general_tag 用于线程在一般队列中的结点 */
     struct list_elem general_tag;
 
@@ -114,7 +114,9 @@ struct task_struct
     struct virtual_addr userprog_vaddr;     /* 用户进程的虚拟地址池 */
 
     struct mem_block_desc u_block_desc[DESC_CNT];   /* 用户进程内存块描述符 */
-
+ 
+ 	int32_t fd_table[MAX_FILES_OPEN_PER_PROC];          /* 文件描述符数组，该数组的下标就是文件描述符，数组里面存储的是文件结构表的下标 */
+ 
     uint32_t cwd_inode_nr;          /* 进程所在的工作目录的inode编号 */
 
     int16_t parent_pid;                    /* 父进程pid */
