@@ -201,7 +201,7 @@ static void partition_format(struct partition *part)
 }
 
 /* 将最上层路径名称解析出来存储到name_store,返回除顶层路径之外的子路径字符串的地址，注意只解析顶层 */
-static char *path_parse(char *pathname, char *name_store)
+char* path_parse(char *pathname, char *name_store)
 {
 	if (pathname[0] == '/')
 	{

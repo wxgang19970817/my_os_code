@@ -8,7 +8,7 @@
 #define __LIB_USER_SYSCALL_H
 
 #include "stdint.h"
-
+#include "fs.h"
 
 /* 用来存放系统子功能号 */
 enum SYSCALL_NR
@@ -20,7 +20,21 @@ enum SYSCALL_NR
 	SYS_FORK,
 	SYS_READ,
 	SYS_PUTCHAR,
-	SYS_CLEAR
+	SYS_CLEAR,
+	SYS_GETCWD,
+	SYS_OPEN,
+	SYS_CLOSE,
+	SYS_LSEEK,
+	SYS_UNLINK,
+	SYS_MKDIR,
+	SYS_OPENDIR,
+	SYS_CLOSEDIR,
+	SYS_CHDIR,
+	SYS_RMDIR,
+	SYS_READDIR,
+	SYS_REWINDDIR,
+	SYS_STAT,
+	SYS_PS
 };
 
 uint32_t getpid(void);
