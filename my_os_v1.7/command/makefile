@@ -1,29 +1,34 @@
+PRJ=prog_arg
+AS=nasm
 CC=gcc
-BIN=prog_no_arg.bin
-Map=prog_no_arg.map
+BIN=$(PRJ).bin
+Map=$(PRJ).map
 LD =ld
 LIB= -I ../lib
 CFLAGS = -m32 -Wall $(LIB) -c -fno-builtin -fno-stack-protector -W -Wstrict-prototypes \
       -Wmissing-prototypes -Wsystem-headers
 LDFLAGS =-e main -m elf_i386 -Map $(Map)
-OBJS = ./prog_no_arg.o ../build/string.o ../build/syscall.o ../build/stdio.o ../build/assert.o  
-
+OBJS = ./$(PRJ).o ../build/string.o ../build/syscall.o ../build/stdio.o ../build/assert.o  start.o
+C_LIB=simple_crt.a
+########## 汇编代码 #########
+start.o : start.S
+	$(AS) -f elf $< -o $@
 
 ########## c代码 ########
-prog_no_arg.o : prog_no_arg.c ../lib/stdio.h
+$(PRJ).o : $(PRJ).c 
 	$(CC) $(CFLAGS) -o $@ $< 
 
-
-
-
+####### C 运行库 #####
+$(C_LIB) : $(OBJS)
+	ar rcs $(C_LIB) $(OBJS)
 ##### 链接 ######
-$(BIN) : $(OBJS)
+$(BIN) : $(C_LIB)
 	$(LD) $(LDFLAGS) $^ -o $@
 build:$(BIN)
 
 hd:
-	dd if=./prog_no_arg.o of=/home/wxgang/bochs/hd.img bs=512 count=10 seek=300 conv=notrunc
+	dd if=./$(BIN) of=/home/wxgang/bochs/hd.img bs=512 count=10 seek=300 conv=notrunc
 
 clean:
-	rm  $(BIN) $(Map) prog_no_arg.o
+	rm  $(BIN) $(Map) $(PRJ).o 
 all: build hd
