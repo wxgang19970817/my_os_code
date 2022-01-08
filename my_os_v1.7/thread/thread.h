@@ -121,12 +121,15 @@ struct task_struct
 
     int16_t parent_pid;                    /* 父进程pid */
 
+    int8_t exit_status;             /* 进程结束时自己调用exit传入的参数 */
+
     /* PCB和0级栈都是在同一个页中，栈位于页的顶端，并向下发展，要保证栈不会把PCB的内容覆盖 */
     uint32_t stack_magic;           /* 栈的边界标记，用于检测栈的溢出，其实就是个魔数，每次都检查是否为初始值 */
 };
   
 extern struct list thread_ready_list;
 extern struct list thread_all_list;
+
 
 void thread_create(struct task_struct* pthread, thread_func function, void* func_arg);
 void init_thread(struct task_struct* pthread, char* name, int prio);
@@ -139,4 +142,7 @@ void thread_unblock(struct task_struct* pthread);
 void thread_yield(void);
 pid_t fork_pid(void);
 void sys_ps(void);
+void thread_exit(struct task_struct* thread_over, bool need_schedule);
+struct task_struct* pid2thread(int32_t pid);
+void release_pid(pid_t pid);
 #endif

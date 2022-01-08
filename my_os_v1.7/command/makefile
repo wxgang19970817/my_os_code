@@ -1,10 +1,11 @@
-PRJ=prog_arg
+PRJ=cat
 AS=nasm
 CC=gcc
 BIN=$(PRJ).bin
 Map=$(PRJ).map
 LD =ld
-LIB= -I ../lib
+LIB= -I ../lib -I ../lib/kernel/ -I ../lib/user/ -I ../kernel/ -I ../device/ -I ../thread/ -I \
+      ../userprog/ -I ../fs/ -I ../shell/
 CFLAGS = -m32 -Wall $(LIB) -c -fno-builtin -fno-stack-protector -W -Wstrict-prototypes \
       -Wmissing-prototypes -Wsystem-headers
 LDFLAGS =-e main -m elf_i386 -Map $(Map)
