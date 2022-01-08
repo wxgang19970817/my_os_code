@@ -159,3 +159,9 @@ void ps(void)
 {
     _syscall0(SYS_PS);
 }
+
+/* 用path指向的可执行文件替换当前进程 */
+int execv(const char* pathname,char** argv)
+{
+    return _syscall2(SYS_EXECV,pathname,argv);
+}
