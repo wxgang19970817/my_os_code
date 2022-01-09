@@ -14,7 +14,7 @@
 #include "memory.h"
 #include "bitmap.h"
 #include "fs.h"
-
+#include "pipe.h"
 
 
 /* 释放用户进程资源:
@@ -70,14 +70,18 @@ static void release_prog_resource(struct task_struct* release_thread)
 	mfree_page(PF_KERNEL,user_vaddr_pool_bitmap,bitmap_pg_cnt);
 
 	/* 关闭进程打开的文件 */
-	uint8_t fd_idx = 3;
-	while(fd_idx < MAX_FILES_OPEN_PER_PROC)
+	uint8_t local_fd = 3;
+	while( local_fd< MAX_FILES_OPEN_PER_PROC)
 	{
-		if(release_thread->fd_table[fd_idx] != -1)
+		if(release_thread->fd_table[local_fd] != -1)
 		{
-			sys_close(fd_idx);
+			if(is_pipe(local_fd))
+			{
+
+			}
+			sys_close(local_fd);
 		}
-		fd_idx++;
+		local_fd++;
 	}
 }
 

@@ -1,4 +1,4 @@
-PRJ=cat
+PRJ=prog_pipe
 AS=nasm
 CC=gcc
 BIN=$(PRJ).bin
