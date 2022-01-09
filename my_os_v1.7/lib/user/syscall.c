@@ -181,6 +181,13 @@ pid_t wait(int32_t* status)
 }
 
 /* 生成管道,pipefd[0]负责读入管道,pipefd[1]负责写入管道 */
-int32_t pipe(int32_t pipefd[2]) {
+int32_t pipe(int32_t pipefd[2]) 
+{
    return _syscall1(SYS_PIPE, pipefd);
+}
+
+/* 显示系统支持的命令 */
+void help(void) 
+{
+   _syscall0(SYS_HELP);
 }
