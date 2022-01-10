@@ -1,0 +1,417 @@
+由于文件 (符号) 而包含了归档成员
+
+simple_crt.a(prog_arg.o)      (main)
+simple_crt.a(string.o)        simple_crt.a(prog_arg.o) (strcat)
+simple_crt.a(syscall.o)       simple_crt.a(prog_arg.o) (getpid)
+simple_crt.a(stdio.o)         simple_crt.a(prog_arg.o) (printf)
+simple_crt.a(assert.o)        simple_crt.a(string.o) (user_spin)
+
+舍弃的输入节
+
+ .group         0x0000000000000000        0x8 simple_crt.a(prog_arg.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 simple_crt.a(prog_arg.o)
+ .group         0x0000000000000000        0x8 simple_crt.a(string.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 simple_crt.a(string.o)
+ .group         0x0000000000000000        0x8 simple_crt.a(syscall.o)
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 simple_crt.a(syscall.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 simple_crt.a(syscall.o)
+ .group         0x0000000000000000        0x8 simple_crt.a(stdio.o)
+ .group         0x0000000000000000        0x8 simple_crt.a(stdio.o)
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 simple_crt.a(stdio.o)
+ .text.__x86.get_pc_thunk.bx
+                0x0000000000000000        0x4 simple_crt.a(stdio.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 simple_crt.a(stdio.o)
+ .group         0x0000000000000000        0x8 simple_crt.a(assert.o)
+ .text.__x86.get_pc_thunk.ax
+                0x0000000000000000        0x4 simple_crt.a(assert.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 simple_crt.a(assert.o)
+
+内存配置
+
+名称           来源             长度             属性
+*default*        0x0000000000000000 0xffffffffffffffff
+
+链结器命令稿和内存映射
+
+LOAD simple_crt.a
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x8048000))
+                0x0000000008048094                . = (SEGMENT_START ("text-segment", 0x8048000) + SIZEOF_HEADERS)
+
+.interp
+ *(.interp)
+
+.note.gnu.build-id
+ *(.note.gnu.build-id)
+
+.hash
+ *(.hash)
+
+.gnu.hash
+ *(.gnu.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.dyn        0x0000000008048094        0x0
+ *(.rel.init)
+ *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
+ *(.rel.fini)
+ *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)
+ *(.rel.data.rel.ro .rel.data.rel.ro.* .rel.gnu.linkonce.d.rel.ro.*)
+ *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
+ *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
+ *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*)
+ *(.rel.ctors)
+ *(.rel.dtors)
+ *(.rel.got)
+ .rel.got       0x0000000008048094        0x0 simple_crt.a(prog_arg.o)
+ *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
+ *(.rel.ifunc)
+
+.rel.plt        0x0000000008048094        0x0
+ *(.rel.plt)
+                [!provide]                        PROVIDE (__rel_iplt_start = .)
+ *(.rel.iplt)
+ .rel.iplt      0x0000000008048094        0x0 simple_crt.a(prog_arg.o)
+                [!provide]                        PROVIDE (__rel_iplt_end = .)
+
+.init
+ *(SORT_NONE(.init))
+
+.plt            0x0000000008048098        0x0
+ *(.plt)
+ *(.iplt)
+ .iplt          0x0000000008048098        0x0 simple_crt.a(prog_arg.o)
+
+.plt.got
+ *(.plt.got)
+
+.plt.sec
+ *(.plt.sec)
+
+.text           0x0000000008048094      0xd2a
+ *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+ *(.text.exit .text.exit.*)
+ *(.text.startup .text.startup.*)
+ *(.text.hot .text.hot.*)
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x0000000008048094      0x163 simple_crt.a(prog_arg.o)
+                0x0000000008048094                main
+ .text.__x86.get_pc_thunk.bx
+                0x00000000080481f7        0x4 simple_crt.a(prog_arg.o)
+                0x00000000080481f7                __x86.get_pc_thunk.bx
+ .text          0x00000000080481fb      0x494 simple_crt.a(string.o)
+                0x00000000080481fb                memset
+                0x0000000008048263                memcpy
+                0x00000000080482d9                memcmp
+                0x000000000804835b                strcpy
+                0x00000000080483c6                strlen
+                0x0000000008048423                strcmp
+                0x00000000080484b2                strchr
+                0x0000000008048520                strrchr
+                0x0000000008048594                strcat
+                0x0000000008048614                strchrs
+ .text.__x86.get_pc_thunk.ax
+                0x000000000804868f        0x4 simple_crt.a(string.o)
+                0x000000000804868f                __x86.get_pc_thunk.ax
+ .text          0x0000000008048693      0x423 simple_crt.a(syscall.o)
+                0x0000000008048693                getpid
+                0x00000000080486b2                write
+                0x00000000080486df                malloc
+                0x0000000008048708                free
+                0x000000000804872f                fork
+                0x000000000804874e                read
+                0x000000000804877b                putchar
+                0x00000000080487a9                clear
+                0x00000000080487c6                getcwd
+                0x00000000080487f2                open
+                0x0000000008048825                close
+                0x000000000804884e                lseek
+                0x0000000008048882                unlink
+                0x00000000080488ab                mkdir
+                0x00000000080488d4                opendir
+                0x00000000080488fd                closedir
+                0x0000000008048926                rmdir
+                0x000000000804894f                readdir
+                0x0000000008048978                rewinddir
+                0x000000000804899f                stat
+                0x00000000080489cb                chdir
+                0x00000000080489f4                ps
+                0x0000000008048a11                execv
+                0x0000000008048a3d                exit
+                0x0000000008048a64                wait
+                0x0000000008048a8d                pipe
+ .text          0x0000000008048ab6      0x2d5 simple_crt.a(stdio.o)
+                0x0000000008048b47                vsprintf
+                0x0000000008048cd3                sprintf
+                0x0000000008048d0d                printf
+ .text          0x0000000008048d8b       0x33 simple_crt.a(assert.o)
+                0x0000000008048d8b                user_spin
+ *(.gnu.warning)
+
+.fini
+ *(SORT_NONE(.fini))
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+
+.rodata         0x0000000008048dc0      0x187
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata        0x0000000008048dc0       0x8e simple_crt.a(prog_arg.o)
+ *fill*         0x0000000008048e4e        0x2 
+ .rodata        0x0000000008048e50       0xc4 simple_crt.a(string.o)
+ .rodata        0x0000000008048f14       0x33 simple_crt.a(assert.o)
+
+.rodata1
+ *(.rodata1)
+
+.eh_frame_hdr
+ *(.eh_frame_hdr)
+ *(.eh_frame_entry .eh_frame_entry.*)
+
+.eh_frame       0x0000000008048f48      0x61c
+ *(.eh_frame)
+ .eh_frame      0x0000000008048f48       0x5c simple_crt.a(prog_arg.o)
+ .eh_frame      0x0000000008048fa4      0x17c simple_crt.a(string.o)
+                                        0x194 (松开之前的大小)
+ .eh_frame      0x0000000008049120      0x398 simple_crt.a(syscall.o)
+                                        0x3c4 (松开之前的大小)
+ .eh_frame      0x00000000080494b8       0x90 simple_crt.a(stdio.o)
+                                         0xd0 (松开之前的大小)
+ .eh_frame      0x0000000008049548       0x1c simple_crt.a(assert.o)
+                                         0x48 (松开之前的大小)
+ *(.eh_frame.*)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.gnu_extab
+ *(.gnu_extab*)
+
+.exception_ranges
+ *(.exception_ranges .exception_ranges*)
+                0x000000000804b000                . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.gnu_extab
+ *(.gnu_extab)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.exception_ranges
+ *(.exception_ranges .exception_ranges*)
+
+.tdata
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ *(.tcommon)
+
+.preinit_array  0x000000000804b000        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x000000000804b000        0x0
+                [!provide]                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
+                [!provide]                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x000000000804b000        0x0
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+
+.dynamic
+ *(.dynamic)
+
+.got            0x000000000804b000        0x0
+ *(.got)
+ .got           0x000000000804b000        0x0 simple_crt.a(prog_arg.o)
+ *(.igot)
+                0x000000000804bff4                . = DATA_SEGMENT_RELRO_END (., (SIZEOF (.got.plt) >= 0xc)?0xc:0x0)
+
+.got.plt        0x000000000804b000        0xc
+ *(.got.plt)
+ .got.plt       0x000000000804b000        0xc simple_crt.a(prog_arg.o)
+                0x000000000804b000                _GLOBAL_OFFSET_TABLE_
+ *(.igot.plt)
+ .igot.plt      0x000000000804b00c        0x0 simple_crt.a(prog_arg.o)
+
+.data           0x000000000804b00c        0x0
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x000000000804b00c        0x0 simple_crt.a(prog_arg.o)
+ .data          0x000000000804b00c        0x0 simple_crt.a(string.o)
+ .data          0x000000000804b00c        0x0 simple_crt.a(syscall.o)
+ .data          0x000000000804b00c        0x0 simple_crt.a(stdio.o)
+ .data          0x000000000804b00c        0x0 simple_crt.a(assert.o)
+
+.data1
+ *(.data1)
+                0x000000000804b00c                _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x000000000804b00c                . = .
+                0x000000000804b00c                __bss_start = .
+
+.bss            0x000000000804b00c        0x0
+ *(.dynbss)
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x000000000804b00c        0x0 simple_crt.a(prog_arg.o)
+ .bss           0x000000000804b00c        0x0 simple_crt.a(string.o)
+ .bss           0x000000000804b00c        0x0 simple_crt.a(syscall.o)
+ .bss           0x000000000804b00c        0x0 simple_crt.a(stdio.o)
+ .bss           0x000000000804b00c        0x0 simple_crt.a(assert.o)
+ *(COMMON)
+                0x000000000804b00c                . = ALIGN ((. != 0x0)?0x4:0x1)
+                0x000000000804b00c                . = ALIGN (0x4)
+                0x000000000804b00c                . = SEGMENT_START ("ldata-segment", .)
+                0x000000000804b00c                . = ALIGN (0x4)
+                0x000000000804b00c                _end = .
+                [!provide]                        PROVIDE (end = .)
+                0x000000000804b00c                . = DATA_SEGMENT_END (.)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000       0x29
+ *(.comment)
+ .comment       0x0000000000000000       0x29 simple_crt.a(prog_arg.o)
+                                         0x2a (松开之前的大小)
+ .comment       0x0000000000000029       0x2a simple_crt.a(string.o)
+ .comment       0x0000000000000029       0x2a simple_crt.a(syscall.o)
+ .comment       0x0000000000000029       0x2a simple_crt.a(stdio.o)
+ .comment       0x0000000000000029       0x2a simple_crt.a(assert.o)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info .gnu.linkonce.wi.*)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line .debug_line.* .debug_line_end)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_addr
+ *(.debug_addr)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+OUTPUT(prog_pipe.bin elf32-i386)
